@@ -26,7 +26,9 @@ exports.helpCmd = rl => {
  * @param rl Objeto readline usando para implementar el CLI
  */
 exports.listCmd = rl => {
-    log('Listar todos los quizzes existentes.', 'red');
+    model.getAll().forEach((quiz, id) => {
+        log(` [${colorize(id, 'magenta')}]: ${quiz.question}`);
+    });
     rl.prompt();
 };
 
