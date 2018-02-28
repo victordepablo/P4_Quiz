@@ -56,11 +56,24 @@ exports.showCmd = (rl, id) => {
  * Añade un nuevo quiz al modelo.
  * Pregunta interactivamente por la pregunta y la respuesta.
  *
- * * @param rl Objeto readline usando para implementar el CLI
+ * Hay que recordar que el funcionamiento de la función rl.question es asincrono.
+ * El prompt hay que sacarlo cuando ya se ha terminado la interacción con el usuario,
+ * es decir, la llamada rl.prompt() se debe hacer en la callback de la segunda
+ * llamada a rl.question.
+ *
+ * @param rl Objeto readline usando para implementar el CLI
  */
 exports.addCmd = rl => {
-    log('Añadir un nuevo quiz', 'red');
-    rl.prompt();
+    rl.question(colorize('Introduzca una pregunta: ', 'red'), question => {
+
+        rl.question(colorize(' Introduzca la respuesta ', 'red'), answer => {
+
+            model.add(question, answer);
+            log(` ${colorize('Se ha añadido', 'magenta')}: ${question} ${colorize('=>', 'magenta' )} ${answer}`);
+            rl.prompt();
+        });
+    })
+
 };
 
 /**
