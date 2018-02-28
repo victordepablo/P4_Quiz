@@ -38,8 +38,17 @@ exports.listCmd = rl => {
  * @param rl Objeto readline usando para implementar el CLI
  * @param id Clave del quiz a mostrar
  */
-exports.showCmd = (rl,id) => {
-    log('Mostrar el quiz indicado.', 'red');
+exports.showCmd = (rl, id) => {
+    if (typeof id === "undefined"){
+        errorlog(`Fata el parámetro id.`);
+    } else{
+        try{
+            const quiz = model.getByIndex(id);
+            log(` [${colorize(id, 'magenta')}]:   ${quiz.question} ${colorize('=>', 'magenta')} ${quiz.answer}`);
+        }catch(error){
+            errorlog(error.message);
+        }
+    }
     rl.prompt();
 };
 
