@@ -1,6 +1,7 @@
 const {log, biglog, errorlog, colorize} = require("./out");
 const model = require('./model');
 
+
 /**
  * Muestra la ayuda
  *
@@ -137,8 +138,29 @@ exports.editCmd = (rl, id) => {
  * @param id clave del quiz a probar.
  */
 exports.testCmd = (rl,id) => {
-    log('Probar el quiz indicado.', 'red');
-    rl.prompt();
+    if (typeof id === "undefined"){
+        errorlog(`Falta el parametro id.`);
+        rl.prompt();
+    }else{
+        try{
+            const quiz = model.getByIndex(id);
+
+            rl.question(colorize(quiz.question + '? ', 'red'), question => {
+                if(question.toUpperCase().trim() === quiz.answer.toUpperCase()){
+                    biglog("CORRECTO", 'green');
+                    rl.prompt();
+            } else{
+                biglog("INCORRECTO", 'red');
+                rl.prompt();
+            }
+        });
+
+        } catch (error){
+            errorlog(error.message);
+            rl.prompt();
+        }
+    }
+
 };
 
 /**
@@ -150,6 +172,7 @@ exports.testCmd = (rl,id) => {
 exports.playCmd = rl =>{
     log('Jugar.', 'red');
     rl.prompt();
+
 };
 
 /**
