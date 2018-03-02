@@ -83,20 +83,51 @@ exports.addCmd = rl => {
  * @param id Clave del quiz a borrar en el modelo.
  */
 exports.deleteCmd = (rl,id) => {
-    log('Borrar el quiz indicado.', 'red');
+    if (typeof id === "undefined"){
+        errorlog(`Fata el parámetro id.`);
+    } else{
+        try{
+            model.deleteByIndex(id);
+        }catch(error){
+            errorlog(error.message);
+        }
+    }
     rl.prompt();
 };
-
 
 /**
  * Edita un quiz del modelo.
  *
- * @param rl Objeto readline usando para implementar el CLI
+ * Hay que redcordar que el funcionamiento de la funcion rl.question es asíncrono.
+ * El prompt hay que sacarlo cuando ya se ha terminado la interacción con el usuario,
+ * es decir, la llamada a rl.prompt() se debe hacer en la callback de la segunda
+ * llamada a rl.question.
+ *
+ * @param rl Objeto readline usado para implementar el CLI.
  * @param id Clave del quiz a editar en el modelo.
  */
 exports.editCmd = (rl, id) => {
-    log('Editar el quiz indicado.', 'red');
-    rl.prompt();
+    if (typeof id === "undefined"){
+        errorlog(`Falta el parametro id.`);
+        rl.prompt();
+    }else{
+        try{
+            const quiz = model.getByIndex(id);
+
+            process.stdout.isTTY && setTimeout(() => {rl.write(quiz.question)},0);
+            rl.question(colorize(' Introduzca una pregunta: ', 'red'), question => {
+                process.stdout.isTTY && setTimeout(() => {rl.write(quiz.answer)},0);
+                rl.question(colorize(' introduzca la respuesta ', 'red'), answer => {
+                    model.update(id, question, answer);
+                    log(` Se ha cambiado el quiz ${colorize(id, 'magenta')} por: ${question} ${colorize('=>', 'magenta' )} ${answer}`);
+                    rl.prompt();
+                });
+            });
+        } catch (error){
+            errorlog(error.message);
+            rl.prompt();
+        }
+    }
 };
 
 /**
@@ -128,8 +159,8 @@ exports.playCmd = rl =>{
  */
 exports.creditsCmd = rl => {
     log('Autores de la practica:');
-    log('Victor De Pablo Gozalo', 'green');
-    log('Mario Esperalta Delgado', 'green');
+    log('victordepablo', 'green');
+    log('marioesperalta', 'green');
     rl.prompt();
 };
 
