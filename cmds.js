@@ -168,40 +168,96 @@ exports.testCmd = (rl,id) => {
  *
  * @param rl Objeto readline usando para implementar el CLI
  */
-exports.playCmd = rl =>{
+exports.playCmd = rl => {
     let score = 0;
-    let toBeResolved = [];
-    //let posicionArray = 0;
+    let toBeResolve = [];
+    let copy = [];
+    copy = model.getAll();
+    for (let i=0;i<model.count(); i++) {
+        toBeResolve[i]=i;
+    }
 
-    for (let i = 0; quizzes.length > i; i++) {
-        toBeResolved[i] = quizzes[i];
-        log(toBeResolved[i], 'blue');
-    }
-    const playOne = () => {
-        if(toBeResolved.length === 0){
-            log('¡No hay preguntas que responder!', 'red');
-            log('Fin del examen. Aciertos: ');
-            biglog(score, 'red');
+    const play = () => {
+        if(toBeResolve.lenght === 0) {
+            log('No hay nada más que preguntar.');
+            log('Fin del juego. Aciertos: ' + score);
+            biglog( score , 'magenta');
             rl.prompt();
-        }else{
-            let id = Math.floor(Math.random() * toBeResolved.lenght);
-            let quiz = toBeResolved[id];
-            rl.question(colorize(quiz.question + '?', 'red'), question => {
-                if (question.toUpperCase() === quiz.answer.toUpperCase()) {
-                    score++;
-                    log('CORRECTO. Lleva ' + score + 'aciertos');
-                    toBeResolved.splice(id, 1);
-                    playOne();
-                }else{
-                    log('INCORRECTO');
-                    log('Fin del examen. Aciertos:');
-                    biglog(score, 'red');
-                    rl.prompt();
+
+        } else {
+            try {
+                log(`Antes del id`);
+                let id = Math.floor(Math.random()*model.count());
+                if(id > copy.length-1) {
+                    play();
                 }
-            });
+                log(`Despues del id`);
+                toBeResolve.splice(id,1);
+                let quiz = "¿" + copy[id].question + "?";
+                log(`Antes de preguntar`);
+                rl.question (colorize (quiz, 'red'), respuesta => {
+                    if( respuesta.toLowerCase().trim() === copy[id].answer.toLowerCase().trim()) {
+                        log(`Debería salir la pregunta`);
+                        score++;
+                        copy.splice(id,1);
+                        log('Correcta - LLeva ' + score + ' aciertos');
+                        play();
+                    } else {
+                        log('Incorrecta');
+                        log('Fin del juego - Aciertos: ' + score);
+                        biglog(score, 'magenta');
+                        rl.prompt();
+
+                    }
+
+                });
+
+            } catch (error) {}
+
         }
-    }
+    };
+
+    play();
+
+
 };
+
+
+
+
+    //let score = 0;
+    //let toBeResolved = [];
+
+    //for (let i = 0; quizzes.length > i; i++) {
+        //toBeResolved[i] = quizzes[i];
+        //log(toBeResolved[i], 'blue');
+    //}
+    //const playOne = () => {
+        //if(toBeResolved.length === 0){
+          //  log('¡No hay preguntas que responder!', 'red');
+            //log('Fin del examen. Aciertos: ');
+            //biglog(score, 'red');
+            //rl.prompt();
+        //}else{
+            //let id = Math.floor(Math.random() * toBeResolved.lenght);
+            //let quiz = toBeResolved[id];
+            //rl.question(colorize(quiz.question + '?', 'red'), question => {
+                //if (question.toUpperCase() === quiz.answer.toUpperCase()) {
+                    //score++;
+                    //log('CORRECTO. Lleva ' + score + 'aciertos');
+                    //toBeResolved.splice(id, 1);
+                    //playOne();
+                //}else{
+                    //log('INCORRECTO');
+                    //log('Fin del examen. Aciertos:');
+                    //biglog(score, 'red');
+                    //rl.prompt();
+                //}
+           // });
+       // }
+    //}
+//};
+
 
 /**
  * Muestra los nombre de los autores de la practica.

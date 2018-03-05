@@ -14,7 +14,7 @@ const DB_FILENAME = "quizzes.json";
 // Al arrancar la aplicación, esta variable contiene estas cuatro preguntas
 // pero al final del módulo se llama a load() para cargar las preguntas
 //guardadas en el fichero DB_FILENAME.
-exports.quizzes = [
+let quizzes = [
     {
         question: "Capital de Italia",
         answer: "Roma"
