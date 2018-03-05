@@ -138,17 +138,24 @@ exports.editCmd = (rl, id) => {
  */
 exports.testCmd = (rl,id) => {
     if (typeof id === "undefined"){
-        errorlog(`Falta el parametro id.`);
+        errorlog(`El parámetro ID no se reconoce.`);
         rl.prompt();
-    }else{
-        try{
-            const quiz = model.getByIndex(id);
+    }
 
-            rl.question(colorize(quiz.question + '? ', 'red'), question => {
-                if(question.toUpperCase().trim() === quiz.answer.toUpperCase()){
+    else {
+
+        try{
+
+            const pregunta = model.getByIndex(id);
+            rl.question(colorize(pregunta.question + '? ', 'red'), question => {
+                if(question.toUpperCase().trim() === pregunta.answer.toUpperCase()){
                     log("Su respuesta es CORRECTA", 'green');
                     rl.prompt();
-            } else{
+
+            }
+
+            else {
+
                 log("Su respuesta es INCORRECTA", 'red');
                 rl.prompt();
             }
@@ -169,10 +176,11 @@ exports.testCmd = (rl,id) => {
  * @param rl Objeto readline usando para implementar el CLI
  */
 exports.playCmd = rl => {
+
     let score = 0;
     let toBeResolve = [];
-    let copy = [];
-    copy = model.getAll();
+    let arrayPreguntas = [];
+    arrayPreguntas = model.getAll();
     for (let i=0;i<model.count(); i++) {
         toBeResolve[i]=i;
     }
@@ -186,16 +194,17 @@ exports.playCmd = rl => {
 
         } else {
             try {
-                let id = Math.floor(Math.random()*model.count());
-                if(id > copy.length-1) {
+                let id = Math.floor(model.count()*Math.random());
+
+                if(id > arrayPreguntas.length-1) {
                     play();
                 }
                 toBeResolve.splice(id,1);
-                let quiz = "¿" + copy[id].question + "? ";
+                let quiz = "¿" + arrayPreguntas[id].question + "? ";
                 rl.question (colorize (quiz, 'red'), respuesta => {
-                    if( respuesta.toLowerCase().trim() === copy[id].answer.toLowerCase().trim()) {
+                    if( respuesta.toUpperCase().trim() === arrayPreguntas[id].answer.toUpperCase().trim()) {
                         score++;
-                        copy.splice(id,1);
+                        arrayPreguntas.splice(id,1);
                         log('Correcto - LLeva ' + score + ' aciertos');
                         play();
                     } else {
@@ -220,39 +229,6 @@ exports.playCmd = rl => {
 
 
 
-
-    //let score = 0;
-    //let toBeResolved = [];
-
-    //for (let i = 0; quizzes.length > i; i++) {
-        //toBeResolved[i] = quizzes[i];
-        //log(toBeResolved[i], 'blue');
-    //}
-    //const playOne = () => {
-        //if(toBeResolved.length === 0){
-          //  log('¡No hay preguntas que responder!', 'red');
-            //log('Fin del examen. Aciertos: ');
-            //biglog(score, 'red');
-            //rl.prompt();
-        //}else{
-            //let id = Math.floor(Math.random() * toBeResolved.lenght);
-            //let quiz = toBeResolved[id];
-            //rl.question(colorize(quiz.question + '?', 'red'), question => {
-                //if (question.toUpperCase() === quiz.answer.toUpperCase()) {
-                    //score++;
-                    //log('CORRECTO. Lleva ' + score + 'aciertos');
-                    //toBeResolved.splice(id, 1);
-                    //playOne();
-                //}else{
-                    //log('INCORRECTO');
-                    //log('Fin del examen. Aciertos:');
-                    //biglog(score, 'red');
-                    //rl.prompt();
-                //}
-           // });
-       // }
-    //}
-//};
 
 
 /**
