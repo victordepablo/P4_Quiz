@@ -1,7 +1,6 @@
 const {log, biglog, errorlog, colorize} = require("./out");
 const model = require('./model');
-
-
+const quizzes = require('./quizzes');
 /**
  * Muestra la ayuda
  *
@@ -147,10 +146,10 @@ exports.testCmd = (rl,id) => {
 
             rl.question(colorize(quiz.question + '? ', 'red'), question => {
                 if(question.toUpperCase().trim() === quiz.answer.toUpperCase()){
-                    biglog("CORRECTO", 'green');
+                    log("CORRECTO", 'green');
                     rl.prompt();
             } else{
-                biglog("INCORRECTO", 'red');
+                log("INCORRECTO", 'red');
                 rl.prompt();
             }
         });
@@ -170,9 +169,38 @@ exports.testCmd = (rl,id) => {
  * @param rl Objeto readline usando para implementar el CLI
  */
 exports.playCmd = rl =>{
-    log('Jugar.', 'red');
-    rl.prompt();
+    let score = 0;
+    let toBeResolved = [];
+    //let posicionArray = 0;
 
+    for (let i = 0; quizzes.length > i; i++) {
+        toBeResolved[i] = quizzes[i];
+        log(toBeResolved[i], 'blue');
+    }
+    const playOne = () => {
+        if(toBeResolved.length === 0){
+            log('¡No hay preguntas que responder!', 'red');
+            log('Fin del examen. Aciertos: ');
+            biglog(score, 'red');
+            rl.prompt();
+        }else{
+            let id = Math.floor(Math.random() * toBeResolved.lenght);
+            let quiz = toBeResolved[id];
+            rl.question(colorize(quiz.question + '?', 'red'), question => {
+                if (question.toUpperCase() === quiz.answer.toUpperCase()) {
+                    score++;
+                    log('CORRECTO. Lleva ' + score + 'aciertos');
+                    toBeResolved.splice(id, 1);
+                    playOne();
+                }else{
+                    log('INCORRECTO');
+                    log('Fin del examen. Aciertos:');
+                    biglog(score, 'red');
+                    rl.prompt();
+                }
+            });
+        }
+    }
 };
 
 /**
