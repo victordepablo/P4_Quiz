@@ -178,7 +178,7 @@ exports.playCmd = rl => {
     }
 
     const play = () => {
-        if(toBeResolve.lenght === 0) {
+        if(toBeResolve.length === 0) {
             log('No hay nada más que preguntar.');
             log('Fin del juego. Aciertos: ' + score);
             biglog( score , 'magenta');
@@ -186,24 +186,20 @@ exports.playCmd = rl => {
 
         } else {
             try {
-                log(`Antes del id`);
                 let id = Math.floor(Math.random()*model.count());
                 if(id > copy.length-1) {
                     play();
                 }
-                log(`Despues del id`);
                 toBeResolve.splice(id,1);
-                let quiz = "¿" + copy[id].question + "?";
-                log(`Antes de preguntar`);
+                let quiz = "¿" + copy[id].question + "? ";
                 rl.question (colorize (quiz, 'red'), respuesta => {
                     if( respuesta.toLowerCase().trim() === copy[id].answer.toLowerCase().trim()) {
-                        log(`Debería salir la pregunta`);
                         score++;
                         copy.splice(id,1);
-                        log('Correcta - LLeva ' + score + ' aciertos');
+                        log('Correcto - LLeva ' + score + ' aciertos');
                         play();
                     } else {
-                        log('Incorrecta');
+                        log('Incorrecto');
                         log('Fin del juego - Aciertos: ' + score);
                         biglog(score, 'magenta');
                         rl.prompt();

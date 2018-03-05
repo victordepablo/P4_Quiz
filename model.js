@@ -86,7 +86,7 @@ const save = () => {
  * @return {number} numero total de preguntas existentes.
  */
 
-exports.count = () => quizzes.lenght;
+exports.count = () => quizzes.length;
 
 
 /**
