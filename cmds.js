@@ -219,37 +219,32 @@ exports.editCmd = (rl, id) => {
  * @param id clave del quiz a probar.
  */
 exports.testCmd = (rl,id) => {
-    if (typeof id === "undefined"){
-        errorlog(`El parámetro ID no se reconoce.`);
-        rl.prompt();
-    }
-
-    else {
-
-        try{
-
-            const pregunta = model.getByIndex(id);
-            rl.question(colorize(pregunta.question + '? ', 'red'), question => {
-                if(question.toUpperCase().trim() === pregunta.answer.toUpperCase()){
-                    log("Su respuesta es CORRECTA", 'green');
-                    rl.prompt();
-
+    validateId(id)
+        .then(id => models.quiz.findById(id))
+        .then(quiz => {
+            if (!quiz) {
+                throw new Error(`El parámetro ID no se reconoce.`);
             }
-
-            else {
-
-                log("Su respuesta es INCORRECTA", 'red');
-                rl.prompt();
-            }
+            log(` [${colorize(quiz.id, 'blue')}]: ${quiz.question}`);
+            return makeQuestion(rl, ' Introduzca la respuesta: ')
+                .then(h => {
+                    if(quiz.answer.toLowerCase() === h.toLowerCase().trim()){
+                        log("Su respuesta es CORRECTA", 'green');
+                    } else{
+                        log("Su respuesta es INCORRECTA", 'red');
+                    }
+                });
+        })
+        .catch(error => {
+            errorlog(error.message);
+        })
+        .then(() => {
+            rl.prompt();
         });
 
-        } catch (error){
-            errorlog(error.message);
-            rl.prompt();
-        }
-    }
 
-};
+}
+
 
 /**
  * Pregunta todos los quizzes existentes en el modelo en orden aleatorio.
@@ -257,6 +252,7 @@ exports.testCmd = (rl,id) => {
  *
  * @param rl Objeto readline usando para implementar el CLI
  */
+
 exports.playCmd = rl => {
 
     let score = 0;
