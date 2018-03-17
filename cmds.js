@@ -253,57 +253,56 @@ exports.testCmd = (rl,id) => {
  * @param rl Objeto readline usando para implementar el CLI
  */
 
-exports.playCmd = rl => {
-
+exports.playCmd = (rl) => {
+    let toBeResolved = [];
     let score = 0;
-    let toBeResolve = [];
-    let arrayPreguntas = [];
-    arrayPreguntas = model.getAll();
-    for (let i=0;i<model.count(); i++) {
-        toBeResolve[i]=i;
+
+
+    const playOne = () => {
+        return new Promise((resolver,rechazar) => {
+
+            if(toBeResolved.length <=0){
+                console.log("No hay nada mas que preguntar.");
+                log("Fin del examen. Número de aciertos aciertos:" + score);
+                resolver();
+                return;
+            }
+            let position = Math.ceil(toBeResolved.length*Math.random())-1;
+            let quiz = toBeResolved[position];
+            toBeResolved.splice(position,1);
+
+            makeQuestion(rl, quiz.question+'? ')
+                .then(answer => {
+                    if(quiz.answer.toUpperCase().trim() === answer.toUpperCase().trim()){
+                        score++;
+                        log("CORRECTO", 'green')
+                        console.log("Lleva ",score, "aciertos");
+                        resolver(playOne());
+                    } else {
+                        log("INCORRECTO", 'red')
+                        console.log("Fin del examen. Aciertos:" + score);
+                        resolver();
+                    }
+                })
+        })
     }
 
-    const play = () => {
-        if(toBeResolve.length === 0) {
-            log('No hay nada más que preguntar.');
-            log('Fin del juego. Aciertos: ' + score);
-            biglog( score , 'magenta');
+    models.quiz.findAll({raw: true})
+        .then(quizzes => {
+            toBeResolved = quizzes;
+        })
+        .then(() => {
+            return playOne();
+        })
+        .catch(error => {
+            console.log(error);
+        })
+        .then(() => {
+            biglog(score,'magenta');
             rl.prompt();
-
-        } else {
-            try {
-                let id = Math.floor(model.count()*Math.random());
-
-                if(id > arrayPreguntas.length-1) {
-                    play();
-                }
-                toBeResolve.splice(id,1);
-                let quiz = "¿" + arrayPreguntas[id].question + "? ";
-                rl.question (colorize (quiz, 'red'), respuesta => {
-                    if( respuesta.toUpperCase().trim() === arrayPreguntas[id].answer.toUpperCase().trim()) {
-                        score++;
-                        arrayPreguntas.splice(id,1);
-                        log('Correcto - LLeva ' + score + ' aciertos');
-                        play();
-                    } else {
-                        log('Incorrecto');
-                        log('Fin del juego - Aciertos: ' + score);
-                        biglog(score, 'magenta');
-                        rl.prompt();
-
-                    }
-
-                });
-
-            } catch (error) {}
-
-        }
-    };
-
-    play();
-
-
+        })
 };
+
 
 
 
