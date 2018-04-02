@@ -259,10 +259,10 @@ exports.playCmd = (socket, rl) => {
 
 
     const playOne = () => {
-        return new Promise((resolver,rechazar) => {
+        return new Promise((resolver, rechazar) => {
 
-            if(toBeResolved.length <=0){
-                console.log(socket, "No hay nada mas que preguntar.");
+            if(toBeResolved.length <= 0){
+                log(socket, "No hay nada mas que preguntar.");
                 log(socket, "Fin del examen. Número de aciertos aciertos:" + score);
                 resolver();
                 return;
@@ -271,16 +271,16 @@ exports.playCmd = (socket, rl) => {
             let quiz = toBeResolved[position];
             toBeResolved.splice(position,1);
 
-            makeQuestion(rl, quiz.question+'? ')
+            makeQuestion(rl, quiz.question + '? ')
                 .then(answer => {
-                    if(quiz.answer.toUpperCase().trim() === answer.toUpperCase().trim()){
+                    if(answer.toUpperCase().trim() === quiz.answer.toUpperCase().trim()){
                         score++;
                         log(socket, "CORRECTO", 'green')
-                        console.log(socket, "Lleva ",score, "aciertos");
+                        log(socket, `Lleva  ${score} aciertos`);
                         resolver(playOne());
                     } else {
                         log(socket, "INCORRECTO", 'red')
-                        console.log(socket, "Fin del examen. Aciertos:" + score);
+                        log(socket, "Fin del examen. Aciertos:" + score);
                         resolver();
                     }
                 })
@@ -295,7 +295,7 @@ exports.playCmd = (socket, rl) => {
             return playOne();
         })
         .catch(error => {
-            console.log(socket, error);
+            log(socket, error);
         })
         .then(() => {
             biglog(socket, score,'magenta');
